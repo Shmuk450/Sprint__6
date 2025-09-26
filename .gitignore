@@ -1,0 +1,9 @@
+# Виртуальное окружение
+venv/
+
+# Allure результаты
+allure_results/
+
+# Pycache
+_pycache_/
+*.pyc
