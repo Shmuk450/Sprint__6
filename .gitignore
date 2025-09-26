@@ -3,7 +3,7 @@ venv/
 
 # Allure результаты
 allure_results/
-
+allure-results/
 # Pycache
 _pycache_/
 *.pyc
