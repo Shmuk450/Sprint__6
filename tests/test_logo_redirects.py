@@ -1,33 +1,43 @@
-import time
-import allure 
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+import allure
 from pages.main_page import MainPage
 
 
-def test_click_yandex_logo(browser):
-    main_page = MainPage(browser)
-    main_page.open("https://qa-scooter.praktikum-services.ru/")
-    main_page.click_yandex_logo()
+class TestLogoRedirects:
 
-    # Ожидание появления второй вкладки
-    WebDriverWait(browser, 10).until(lambda d: len(d.window_handles) > 1)
+    @allure.title("Проверка редиректа по клику на логотип Яндекса")
+    def test_click_yandex_logo(self, browser):
+        main_page = MainPage(browser)
+        main_page.open("https://qa-scooter.praktikum-services.ru/")
 
-    # Переключаемся на новую вкладку
-    browser.switch_to.window(browser.window_handles[1])
+        # Сначала узнаём текущее количество вкладок
+        current_handles_count = len(browser.window_handles)
 
-    # Явное ожидание, пока в URL появится 'dzen.ru'
-    WebDriverWait(browser, 10).until(lambda d: "dzen.ru" in d.current_url)
+        # Кликаем по логотипу Яндекса
+        main_page.click_yandex_logo()
 
-    current_url = browser.current_url
-    print("🔎 URL новой вкладки:", current_url)
+        # Ждём появления новой вкладки
+        main_page.wait_for_new_window(current_handles_count)
 
-    assert "dzen.ru" in current_url
+        # Переключаемся на новую вкладку (с индексом 1)
+        main_page.switch_to_tab(1)
 
+        # Ждём, пока URL новой вкладки будет содержать "dzen.ru"
+        main_page.wait_for_url_contains("dzen.ru")
 
-def test_click_scooter_logo(browser):
-    main_page = MainPage(browser)
-    main_page.open("https://qa-scooter.praktikum-services.ru/order")
-    main_page.click_scooter_logo()
-    assert browser.current_url == "https://qa-scooter.praktikum-services.ru/"
+        # Получаем текущий URL новой вкладки
+        current_url = main_page.get_current_url()
+
+        # Проверяем, что это действительно редирект на Дзен
+        assert "dzen.ru" in current_url
+
+    @allure.title("Проверка редиректа по клику на логотип Самоката")
+    def test_click_scooter_logo(self, browser):
+        main_page = MainPage(browser)
+        main_page.open("https://qa-scooter.praktikum-services.ru/order")
+
+        # Клик по логотипу Самоката
+        main_page.click_scooter_logo()
+
+        # Проверка URL после перехода
+        current_url = main_page.get_current_url()
+        assert current_url == "https://qa-scooter.praktikum-services.ru/"
